@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"os"
 	"runtime"
+    "flag"
 )
 
 var black = color.RGBA{0x00, 0x00, 0x00, 0xff}
@@ -96,37 +97,40 @@ func updateInfections(people []agents.Person, matrix [][]int, c chan int) {
 	c <- 1
 }
 
+
+var maxTime = flag.Int("time", 2000, "The number of steps to simulate.")
+var width = flag.Int("width", 500, "The width of the world.")
+var height = flag.Int("height", 500, "The height of the world.")
+var density = flag.Float64("density", 0.1, "The density of the agents in the world.")
+
 func main() {
 
-	maxTime := 2000
 	numCPU := runtime.NumCPU()
-	width := 300
-	height := 300
+    flag.Parse()
 
-	density := 0.1
-	numPeople := int(float64(width*height) * density)
+	numPeople := int(float64(*width * *height) * *density)
 
-	fmt.Printf("Duration: %d ticks.\n", maxTime)
-	fmt.Printf("World Size: %dx%d.\n", width, height)
+	fmt.Printf("Duration: %d ticks.\n", *maxTime)
+	fmt.Printf("World Size: %dx%d.\n", *width, *height)
 	fmt.Printf("Population: %d.\n", numPeople)
-	fmt.Printf("Density: %f.\n", density)
+	fmt.Printf("Density: %f.\n", *density)
 	fmt.Printf("Using %d CPU cores.\n", numCPU)
 	fmt.Printf("Simulation started.\n")
 
 	file, _ := os.Create("simulation.csv")
 
 	// Create a new progress bar.
-	bar := pb.StartNew(maxTime)
+	bar := pb.StartNew(*maxTime)
 
-	people := generatePeople(numPeople, width, height)
+	people := generatePeople(numPeople, *width, *height)
 	people[rand.Intn(numPeople)].Status = 1
 
-	matrix := generateMatrix(width, height)
+	matrix := generateMatrix(*width, *height)
 
 	rectangle := image.Rect(0, 0, len(matrix[0]), len(matrix))
 	RGBAImage := image.NewRGBA(rectangle)
 
-	for time := 0; time < maxTime; time++ {
+	for time := 0; time < *maxTime; time++ {
 
 		for i, _ := range populationStatistics {
 			populationStatistics[i] = 0
