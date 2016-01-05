@@ -120,7 +120,7 @@ func main() {
 	// Create a new progress bar.
 	bar := pb.StartNew(*maxTime)
 
-	disease := NewDisease(*virality, []int{0, 150, 50, 0})
+	disease := NewDisease(*virality, []int{0, 150, 50, 0}, SEIRMatrix)
 
 	people := generatePeople(numPeople, *width, *height, *disease)
 	people[rand.Intn(numPeople)].Status = 1

@@ -30,7 +30,11 @@ func (person *Person) Print() {
 }
 
 func (person *Person) Update(matrix [][]int) {
+	person.UpdatePosition(matrix)
+	person.UpdateStatus()
+}
 
+func (person *Person) UpdatePosition(matrix [][]int) {
 	width := len(matrix[0])
 	height := len(matrix)
 
@@ -55,21 +59,23 @@ func (person *Person) Update(matrix [][]int) {
 			person.Y = newY
 			break
 		}
-
 	}
+}
 
-	if person.Status == 1 && person.Clock < person.Disease.Timer[person.Status] {
+func (person *Person) UpdateStatus() {
+	if person.Clock >= person.Disease.Timer[person.Status] && person.Disease.Timer[person.Status] > 0 {
+		for col, _ := range person.Disease.Stages[person.Status] {
+			if person.Disease.Stages[person.Status][col] == 0 {
+				continue
+			} else if rand.Float64() <= person.Disease.Stages[person.Status][col] {
+				person.Status = col
+				person.Clock = 0
+				return
+			}
+		}
+	} else {
 		person.Clock++
-	} else if person.Status == 2 && person.Clock < person.Disease.Timer[person.Status] {
-		person.Clock++
-	} else if person.Status == 2 {
-		person.Status = 3
-		person.Clock = 0
-	} else if person.Status == 1 {
-		person.Status = 2
-		person.Clock = 0
 	}
-
 }
 
 func (person *Person) CheckInfection(matrix [][]int) {
